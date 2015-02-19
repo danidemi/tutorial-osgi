@@ -8,3 +8,6 @@ release.properties
 .project
 .settings/
 /pom.xml~
+/.ant-targets-build.xml
+/felix-cache/
+/bundle/*
