@@ -12,19 +12,19 @@
     </description>
 
 	<artifact:dependencies pathId="felix.classpath">
-		<dependency groupId="org.osgi" artifactId="org.osgi.core" version="6.0.0" scope="runtime" />
-		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="runtime" />
-		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.6.0" scope="runtime" />
+		<dependency groupId="org.osgi" artifactId="org.osgi.core" version="6.0.0" scope="compile" />
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="compile" />
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.6.0" scope="compile" />
 	</artifact:dependencies>
 	
 	<artifact:dependencies pathId="felix.main.classpath">
-		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="runtime" />
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="compile" />
 	</artifact:dependencies>	
 
 	<artifact:dependencies pathId="felix.defaultbundles">
-		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.shell" version="1.4.3" scope="runtime" />
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.shell" version="1.4.3" scope="compile" />
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.bundlerepository" version="2.0.2" scope="compile" />
 		<!--
-		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.bundlerepository" version="2.0.2" scope="runtime" />
 		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.gogo.runtime" version="0.12.1" />
 		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.gogo.command" version="0.14.0" />
 		<dependency groupId="org.apache.felix.gogo" artifactId="org.apache.felix.gogo.console" version="0.4.0" />
@@ -167,13 +167,14 @@
 	
 	
 
-	<target name="example-1" depends="mvn.install">
+	<target name="example-1" depends="mvn.install, bundle">
 
+		
 		<copy todir="bundle">
 			<path refid="felix.defaultbundles" />			
 		</copy>
-
-		<antcall target="felix" />
+		
+		<antcall target="felix3" />
 	</target>
 
 	<target name="example-2" depends="mvn.install, bundle, felix">
