@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="tutorial-osgi" xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+<project name="tutorial-osgi" 
+	xmlns:artifact="antlib:org.apache.maven.artifact.ant"
+	xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors"
+	xmlns:rcmp="antlib:org.apache.tools.ant.types.resources.comparators" >
 
 	<path id="maven-ant-tasks.classpath" path="antlib/maven-ant-tasks-2.1.3.jar" />
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
@@ -13,6 +16,10 @@
 		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="runtime" />
 		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.6.0" scope="runtime" />
 	</artifact:dependencies>
+	
+	<artifact:dependencies pathId="felix.main.classpath">
+		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="runtime" />
+	</artifact:dependencies>	
 
 	<artifact:dependencies pathId="felix.defaultbundles">
 		<dependency groupId="org.apache.felix" artifactId="org.apache.felix.shell" version="1.4.3" scope="runtime" />
@@ -99,6 +106,44 @@
 			-->
 			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
 		</java>
+	</target>	
+	
+	<!-- http://felix.apache.org/site/integrating-felix-with-eclipse.html -->
+	<target name="felix3">
+		
+		<echo>${toString:felix.main.classpath}</echo>
+		
+		
+		<path id="mainjar">	
+			<!--
+			<first>
+				<path id="felix.main.classpath" />
+			</first>
+			<path id="felix.main.classpath" />
+			<pathelement id="felix.main.classpath"/>
+			<filelist>
+				<file name="/tmp"/>
+			</filelist>
+			<first>
+				<path refid="felix.main.classpath" />
+			</first>
+			<path refid="felix.main.classpath" />
+			-->
+			<!--
+			-->
+			<restrict>
+				<path refid="felix.main.classpath" />
+				<rsel:contains text=".main" casesensitive="no" />
+			</restrict>
+		</path>
+		<echo>${toString:mainjar}</echo>
+		
+		<java jar="${toString:mainjar}" fork="true">
+			<classpath refid="felix.main.classpath" />
+			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
+		</java>
+
+
 	</target>	
 
 	<target name="bundle">
