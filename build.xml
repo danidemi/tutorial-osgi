@@ -4,12 +4,20 @@
 	xmlns:rsel="antlib:org.apache.tools.ant.types.resources.selectors"
 	xmlns:rcmp="antlib:org.apache.tools.ant.types.resources.comparators" 
 	default="setup" >
+	
+	<!--
+	References:
+	http://felix.apache.org/site/integrating-felix-with-eclipse.html
+	http://docs.oracle.com/javase/7/docs/api/java/io/FilePermission.html
+	http://docs.oracle.com/javase/7/docs/api/java/lang/RuntimePermission.html
+	http://docs.oracle.com/javase/7/docs/api/index.html?java/security/BasicPermission.html
+	-->
 
 	<path id="maven-ant-tasks.classpath" path="antlib/maven-ant-tasks-2.1.3.jar" />
 	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" onerror="ignore" />
 
 	<description>
-    	Launching OSGI
+    	Launching various OSGI examples.
     </description>
 	
 	
@@ -35,10 +43,7 @@
 		<mkdir dir="antlib"/>
 	</target>
 	
-	<target name="setup" depends="-setup.init, -setup.hasMavenAntTask, -setup.getMavenAntTask" description="Set up the environment">
-		<description>
-			Set up the environment downloading the needed libraries.
-		</description>
+	<target name="setup" depends="-setup.init, -setup.hasMavenAntTask, -setup.getMavenAntTask" description="Set up the environment. You need to run this before any other example.">
 		<echo>Setup Completed</echo>
 	</target>
 	<!-- ================================================================== -->
@@ -54,24 +59,29 @@
 	<target name="-run.felix.classpath">
 		
 		<artifact:dependencies pathId="felix.classpath">
-			<dependency groupId="org.osgi" artifactId="org.osgi.core" version="6.0.0" scope="compile" />
-			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="compile" />
-			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.6.0" scope="compile" />
+			<dependency groupId="org.osgi" artifactId="org.osgi.core" version="6.0.0" />
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" />
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.framework" version="4.6.0" />
 		</artifact:dependencies>
 		
 		<artifact:dependencies pathId="felix.main.classpath">
 			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.main" version="4.6.0" scope="compile" />
 		</artifact:dependencies>	
 	
-		<artifact:dependencies pathId="felix.defaultbundles">
-			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.shell" version="1.4.3" scope="compile" />
-			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.bundlerepository" version="2.0.2" scope="compile" />
-			<!--
+		<!-- build the 'felix.defaultbundles' classpath that contains all the jars shipped with Felix by default -->
+		<artifact:dependencies pathId="tmp.felix.defaultbundles">
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.gogo.shell" version="0.10.0" />
 			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.gogo.runtime" version="0.12.1" />
 			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.gogo.command" version="0.14.0" />
-			<dependency groupId="org.apache.felix.gogo" artifactId="org.apache.felix.gogo.console" version="0.4.0" />
-			-->
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.bundlerepository" version="2.0.2" />
 		</artifact:dependencies>
+		<path id="felix.defaultbundles">	
+			<restrict>
+				<path refid="tmp.felix.defaultbundles" />
+				<rsel:contains text=".felix." casesensitive="no" />
+			</restrict>
+		</path>
+		
 	</target>
 
 
@@ -85,6 +95,10 @@
 			</exec>
 		</sequential>
 	</macrodef>
+	
+	<target name="-mvn.clean">
+		<mvn commands="clean"/>
+	</target>
 
 	<target name="mvn.install">
 		<exec executable="bash" newenvironment="false" spawn="false">
@@ -97,16 +111,13 @@
 		<mvn commands="clean"/>
 	</target>
 
-	<!-- http://felix.apache.org/site/integrating-felix-with-eclipse.html -->
+
 	<target name="felix">
 		
 		<echo>${toString:felix.classpath}</echo>
 
 		<java classname="org.apache.felix.main.Main" >
 			<permissions>
-				<!-- http://docs.oracle.com/javase/7/docs/api/java/io/FilePermission.html -->
-				<!-- http://docs.oracle.com/javase/7/docs/api/java/lang/RuntimePermission.html -->
-				<!-- http://docs.oracle.com/javase/7/docs/api/index.html?java/security/BasicPermission.html -->
 				<grant class="java.util.PropertyPermission" name="*" actions="read,write" />
 				<grant class="java.lang.RuntimePermission" name="*" />
 				<grant class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write" />
@@ -121,59 +132,22 @@
 		</java>
 	</target>
 	
-	<!-- http://felix.apache.org/site/integrating-felix-with-eclipse.html -->
+	<!--
 	<target name="felix2">
-		
-
-
-		<java jar="original/felix.jar" fork="true">
-			
-			<!--
-			<permissions>
-				<grant class="java.util.PropertyPermission" name="*" actions="read,write" />
-				<grant class="java.lang.RuntimePermission" name="*" />
-				<grant class="java.io.FilePermission" name="&lt;&lt;ALL FILES&gt;&gt;" actions="read,write" />
-				<grant class="java.lang.reflect.ReflectPermission" name="suppressAccessChecks" />
-				<grant class="java.net.NetPermission" name="specifyStreamHandler" />
-				<grant class="java.security.SecurityPermission" name="*" />
-				<grant class="org.osgi.framework.AdminPermission" name="*" actions="resolve,context,execute" />
-				<grant class="java.io.FilePermission" name="*" actions="read" />
-			</permissions>
-			-->
-			<!--
-			<classpath>
-				<pathelement location="original/felix.jar" />
-			</classpath>
-			-->
-			<!--
-			-->
+		<java jar="original/felix.jar" fork="true">			
 			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
 		</java>
-	</target>	
+	</target>
+	-->	
 	
-	<!-- http://felix.apache.org/site/integrating-felix-with-eclipse.html -->
 	<target name="felix3">
+		
+		<delete dir="felix-cache" />
 		
 		<echo>${toString:felix.main.classpath}</echo>
 		
 		
 		<path id="mainjar">	
-			<!--
-			<first>
-				<path id="felix.main.classpath" />
-			</first>
-			<path id="felix.main.classpath" />
-			<pathelement id="felix.main.classpath"/>
-			<filelist>
-				<file name="/tmp"/>
-			</filelist>
-			<first>
-				<path refid="felix.main.classpath" />
-			</first>
-			<path refid="felix.main.classpath" />
-			-->
-			<!--
-			-->
 			<restrict>
 				<path refid="felix.main.classpath" />
 				<rsel:contains text=".main" casesensitive="no" />
@@ -186,7 +160,6 @@
 			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
 		</java>
 
-
 	</target>	
 
 	<target name="bundle">
@@ -196,12 +169,12 @@
 				<include name="*.jar"/>
 			</fileset>
 		</delete>
-		<copy todir="bundle">
+		<copy todir="bundle" failonerror="no">
 			<fileset dir="osgi-listener/target" >
 				<include name="*.jar"/>
 			</fileset>
 		</copy>
-		<copy todir="bundle">
+		<copy todir="bundle" failonerror="no">
 			<fileset dir="osgi-service/target" >
 				<include name="*.jar"/>
 			</fileset>
@@ -210,8 +183,8 @@
 	
 	
 	
-	<target name="example-felix-standard-bundles" depends="setup, mvn.install, -run.felix.classpath, bundle" description="just felix">
-
+	<target name="example-felix-standard-bundles" depends="-mvn.clean, -run.felix.classpath, bundle" description="Run bare Felix with Gogo console.">
+		
 		<copy todir="bundle">
 			<path refid="felix.defaultbundles" />			
 		</copy>

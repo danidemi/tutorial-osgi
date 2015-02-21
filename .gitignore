@@ -13,3 +13,5 @@ release.properties
 /bundle/*
 /bundle/
 antlib/*.jar
+*.md~
+
