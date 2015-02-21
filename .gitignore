@@ -11,3 +11,5 @@ release.properties
 /.ant-targets-build.xml
 /felix-cache/
 /bundle/*
+/bundle/
+antlib/*.jar
