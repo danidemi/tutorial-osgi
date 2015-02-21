@@ -11,6 +11,7 @@
 	http://docs.oracle.com/javase/7/docs/api/java/io/FilePermission.html
 	http://docs.oracle.com/javase/7/docs/api/java/lang/RuntimePermission.html
 	http://docs.oracle.com/javase/7/docs/api/index.html?java/security/BasicPermission.html
+	http://eclipse.org/equinox/documents/quickstart-framework.php
 	-->
 
 	<path id="maven-ant-tasks.classpath" path="antlib/maven-ant-tasks-2.1.3.jar" />
@@ -51,7 +52,14 @@
 	<!-- ================================================================== -->
 	
 	
-	
+	<target name="-run.equinox.classpath">
+		<artifact:dependencies pathId="equinox.classpath">
+			<dependency groupId="org.eclipse.equinox" artifactId="osgi" version="3.1.1" />
+			<dependency groupId="org.osgi" artifactId="org.osgi.core" version="6.0.0" />
+			<dependency groupId="org.eclipse.equinox" artifactId="org.eclipse.equinox.common" version="3.6.0" />
+			<dependency groupId="org.eclipse.birt.runtime.3_7_1" artifactId="org.eclipse.update.configurator" version="3.3.100" />			
+		</artifact:dependencies>
+	</target>
 	
 	
 
@@ -81,6 +89,16 @@
 				<rsel:contains text=".felix." casesensitive="no" />
 			</restrict>
 		</path>
+		
+		<artifact:dependencies pathId="tmp.felix.logservicebundle">
+			<dependency groupId="org.apache.felix" artifactId="org.apache.felix.log" version="1.0.1" />
+		</artifact:dependencies>
+		<path id="felix.logservicebundle">	
+			<restrict>
+				<path refid="tmp.felix.logservicebundle" />
+				<rsel:contains text=".felix." casesensitive="no" />
+			</restrict>
+		</path>		
 		
 	</target>
 
@@ -146,7 +164,6 @@
 		
 		<echo>${toString:felix.main.classpath}</echo>
 		
-		
 		<path id="mainjar">	
 			<restrict>
 				<path refid="felix.main.classpath" />
@@ -159,7 +176,62 @@
 			<classpath refid="felix.main.classpath" />
 			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
 		</java>
+		
+		<echo>${felix.out}</echo>
 
+	</target>
+	
+	<target name="equinox.command-line" depends="-run.equinox.classpath" description="Equinox command line params">
+						
+		<path id="equinox.main.jar">
+			<first>
+				<path refid="equinox.classpath" />
+			</first>
+		</path>
+		
+		<echo>${toString:equinox.main.jar}</echo>
+		<java jar="${toString:equinox.main.jar}" fork="true" >
+			<classpath refid="equinox.classpath" />
+			<!--
+			<arg line="-console"/>
+			-->
+			<arg line="-install ./bundle"/>
+		</java>		
+		
+
+	</target>	
+	
+	<target name="equinox" depends="-run.equinox.classpath">
+				
+		<echo>${toString:equinox.classpath}</echo>
+		
+		<path id="equinox.main.jar">
+			<first>
+				<path refid="equinox.classpath" />
+			</first>
+		</path>
+		
+		<java jar="${toString:equinox.main.jar}" fork="true" >
+			<classpath refid="equinox.classpath" />
+			<arg line="-console"/>
+		</java>		
+		
+		<!--
+		<path id="mainjar">	
+			<restrict>
+				<path refid="felix.main.classpath" />
+				<rsel:contains text=".main" casesensitive="no" />
+			</restrict>
+		</path>
+		<echo>${toString:mainjar}</echo>
+		
+		<java jar="${toString:mainjar}" fork="true" outputproperty="felix.out">
+			<classpath refid="felix.main.classpath" />
+			<sysproperty key="felix.config.properties" value="file://${basedir}/config.properties" />
+		</java>
+		
+		<echo>${felix.out}</echo>
+		-->
 	</target>	
 
 	<target name="bundle">
@@ -181,6 +253,8 @@
 		</copy>
 	</target>
 	
+
+	
 	
 	
 	<target name="example-felix-standard-bundles" depends="-mvn.clean, -run.felix.classpath, bundle" description="Run bare Felix with Gogo console.">
@@ -190,7 +264,26 @@
 		</copy>
 		
 		<antcall target="felix3" inheritall="true" inheritrefs="true" />
+		
 	</target>
+	
+	<target name="example-felix-hello-world" depends="-mvn.clean, -run.felix.classpath, bundle" description="Run the Felix Gogo shell with an 'Hello World' bundle.">
+		
+		<copy todir="bundle">
+			<path refid="felix.defaultbundles" />
+			<!--
+			-->
+			<!--
+			<path refid="felix.logservicebundle" />
+			-->
+		</copy>
+		
+		<mvn commands="install -pl hello-world"/>
+		<copy todir="bundle" file="hello-world/target/hello-world.jar" />
+		
+		<antcall target="felix3" inheritall="true" inheritrefs="true" />
+		
+	</target>	
 
 	<target name="example-2" depends="mvn.install, bundle, felix">
 	</target>

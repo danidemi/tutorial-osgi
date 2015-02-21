@@ -11,6 +11,7 @@
 	<modules>
 		<module>osgi-listener</module>
 		<module>osgi-service</module>
+		<module>hello-world</module>
 	</modules>
 
 	<dependencies>
