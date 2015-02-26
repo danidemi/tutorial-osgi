@@ -1,15 +1,7 @@
 Manifest-Version: 1.0
-Comment: Bundle-Activator attribute tells the framework which class implements the BundleActivator interface. 
-Comment: With this information, when the OSGi framework starts the bundle, an instance of the specified class is created and its start() method is invoked. 
-Comment: The created instance will also have its stop() method called when the framework stops the bundle. 
-Comment: The Import-Package attribute informs the framework of the bundle's dependencies on external packages; 
-Comment: all bundles with an activator must import org.osgi.framework since it contains the core OSGi class definitions. 
-Comment: Any packages dependencies will be verified and resolved by the OSGi framework. 
-Comment: (Note: Make sure your manifest file ends in a trailing carriage return or else the last line will be ignored.)
-Bundle-Activator: com.danidemi.osgitutorial.Activator
-Export-Package: com.danidemi.osgitutorial
-Import-Package: org.osgi.framework
+Bundle-Activator: com.danidemi.tutorial.osgi.dictionaryclient.Activator
+Import-Package: com.danidemi.tutorial.osgi.dictionaryservice,org.osgi.framework
 Bundle-SymbolicName: com.danidemi.tutorial.osgi.dictionarylistener
 Bundle-Version: 1.0.1
-Bundle-Name: Danidemi's OSGi tutorial - Service Listener
-Bundle-Activator: com.danidemi.osgitutorial.Activator
+Bundle-Name: Danidemi's OSGi tutorial - Service Client
+

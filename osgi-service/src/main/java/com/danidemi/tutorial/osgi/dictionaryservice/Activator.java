@@ -1,4 +1,4 @@
-package com.danidemi.osgitutorial;
+package com.danidemi.tutorial.osgi.dictionaryservice;
 
 import java.util.Hashtable;
 
@@ -23,6 +23,7 @@ public class Activator implements BundleActivator
     **/
     public void start(BundleContext context)
     {
+    	System.out.println("service started");
         Hashtable<String, String> props = new Hashtable<String, String>();
         props.put("Language", "English");
         context.registerService(
@@ -38,6 +39,7 @@ public class Activator implements BundleActivator
     **/
     public void stop(BundleContext context)
     {
+    	System.out.println("service stopped");
         // NOTE: The service is automatically unregistered.
     }
 

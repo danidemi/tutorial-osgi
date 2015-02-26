@@ -1,4 +1,4 @@
-package com.danidemi.osgitutorial;
+package com.danidemi.tutorial.osgi.dictionaryclient;
 
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
