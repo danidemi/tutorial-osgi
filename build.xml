@@ -271,11 +271,6 @@
 		
 		<copy todir="bundle">
 			<path refid="felix.defaultbundles" />
-			<!--
-			-->
-			<!--
-			<path refid="felix.logservicebundle" />
-			-->
 		</copy>
 		
 		<mvn commands="install -pl hello-world"/>
@@ -285,7 +280,20 @@
 		
 	</target>	
 
-	<target name="example-2" depends="mvn.install, bundle, felix">
+	<target name="example-felix-service-listener" depends="-mvn.clean, -run.felix.classpath, bundle" description="Run a service and a related listener.">
+		
+		<copy todir="bundle">
+			<path refid="felix.defaultbundles" />
+		</copy>
+		
+		<mvn commands="install -pl osgi-listener"/>
+		<mvn commands="install -pl osgi-service"/>
+		
+		<copy todir="bundle" file="osgi-service/target/sample-service.jar" />
+		<copy todir="bundle" file="osgi-listener/target/sample-service-listener.jar" />
+		
+		<antcall target="felix3" inheritall="true" inheritrefs="true" />
+		
 	</target>
 
 </project>

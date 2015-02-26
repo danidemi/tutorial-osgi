@@ -1,7 +1,3 @@
-/*
- * Apache Felix OSGi tutorial.
-**/
-
 package com.danidemi.osgitutorial;
 
 import java.util.Hashtable;
@@ -30,7 +26,9 @@ public class Activator implements BundleActivator
         Hashtable<String, String> props = new Hashtable<String, String>();
         props.put("Language", "English");
         context.registerService(
-            DictionaryService.class.getName(), new DictionaryImpl(), props);
+        		DictionaryService.class.getName(), 
+        		new DictionaryImpl(), 
+        		props);
     }
 
     /**
